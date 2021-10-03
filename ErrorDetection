@@ -1,0 +1,434 @@
+#include<iostream>
+#include<string>
+#include <vector>
+using namespace std;
+void LRC(int nob)
+{
+	int arr[8] = { 0,0,0,0,0,0,0,0 };
+	cout << "\n Enter the data bits (0's and 1's only): \n";
+	int n = nob / 8;
+	string text;
+	do
+	{
+		cin >> text;
+		if (text.length() != nob)
+		{
+			cout << "\n Data bits must be of length :" << nob << "\n Please Try again !! \n";
+		}
+	} while(text.length() != nob);
+	char* char_arr;
+	char_arr = &text[0];
+	
+	for (int i = 0;i < n;i++)
+	{
+		for (int j = 0; j < 8;j++)
+		{
+			int temp;
+			temp = char_arr[(8 * i) + j] - '0';
+			if (temp == 1)
+			{
+				arr[j]++;
+			}
+			else if (temp == 0)
+			{
+				arr[j] = arr[j];
+			}
+			else
+			{
+				cout << "\n Data bits must have 0's and 1's only !!\n";
+				LRC(nob);
+				return;
+			}
+		}		
+	}
+	cout << endl;
+	for (int j = 0; j < 8;j++)
+	{
+		arr[j]=arr[j]%2;
+	}
+	char parity;
+	int check=0;
+	do
+	{
+		cout << "\n Do you want Odd(O)/Even(E) parity: \t";
+		cin >> parity;
+		cout << endl<<"LRC is:\t";
+		if (parity == 'O' || parity == 'o')
+		{
+			check = 1;
+			for (int j = 0; j < 8;j++)
+			{
+				if (arr[j] == 0)
+				{
+					cout << 1;
+				}
+				else if (arr[j] == 1)
+				{
+					cout << 0;
+				}
+			}
+		}
+		else if (parity == 'E' || parity == 'e')
+		{
+			check = 1;
+			for (int j = 0; j < 8;j++)
+			{
+				cout<<arr[j];
+			}
+		}
+		else
+		{
+			cout << "\n Incorrect choice! Please choose between Odd(O)/Even(E) Parity only! \n";
+		}
+	} while (check == 0);
+}
+void VRC(int nob)
+{
+	int n = nob / 8;
+	string text;
+	do
+	{
+		cin >> text;
+		if (text.length() != nob)
+		{
+			cout << "\n Data bits must be of length :" << nob << "\n Please Try again !! \n";
+		}
+	} while (text.length() != nob);
+	char* char_arr;
+	char_arr = &text[0];
+
+	int* arr = new int(n);
+	for (int x = 0; x < n; x++) {
+		arr[x]=0;
+	}
+	for (int i = 0;i < n;i++)
+	{
+		int sum = 0;
+		for (int j = 0; j < 8;j++)
+		{
+			int temp;
+			temp = char_arr[(8 * i) + j] - '0';
+			if (temp == 1 ||temp == 0)
+			{
+				sum += temp;
+			}
+			else
+			{
+				cout << "\n Data bits must have 0's and 1's only !!\n";
+				VRC(nob);
+				return;
+			}
+		}
+		arr[i] = sum%2;
+	}
+	cout << endl;
+	char parity;
+	int check = 0;
+	do
+	{
+		cout << "\n Do you want Odd(O)/Even(E) parity: \t";
+		cin >> parity;
+		cout << endl << "VRC is:\t";
+		if (parity == 'O' || parity == 'o')
+		{
+			check = 1;
+			for (int j = 0; j < n;j++)
+			{
+				if (arr[j] == 0)
+				{
+					cout << 1;
+				}
+				else if (arr[j] == 1)
+				{
+					cout << 0;
+				}
+			}
+		}
+		else if (parity == 'E' || parity == 'e')
+		{
+			check = 1;
+			for (int j = 0; j < n;j++)
+			{
+				cout << arr[j];
+			}
+		}
+		else
+		{
+			cout << "\n Incorrect choice! Please choose between Odd(O)/Even(E) Parity only! \n";
+		}
+	} while (check == 0);
+}
+string xor1(string a, string b)
+{
+
+	string result = "";
+
+	int n = b.length();
+
+	for (int i = 1; i < n; i++)
+	{
+		if (a[i] == b[i])
+			result += "0";
+		else
+			result += "1";
+	}
+	return result;
+}
+
+string mod2div(string divident, string divisor)
+{
+
+	int pick = divisor.length();
+
+	string tmp = divident.substr(0, pick);
+
+	int n = divident.length();
+
+	while (pick < n)
+	{
+		if (tmp[0] == '1')
+
+			tmp = xor1(divisor, tmp) + divident[pick];
+		else
+
+			tmp = xor1(std::string(pick, '0'), tmp) +
+			divident[pick];
+
+		pick += 1;
+	}
+
+	if (tmp[0] == '1')
+		tmp = xor1(divisor, tmp);
+	else
+		tmp = xor1(std::string(pick, '0'), tmp);
+
+	return tmp;
+}
+
+void encodeData(string data, string key)
+{
+	int l_key = key.length();
+
+	string appended_data = (data +
+		std::string(
+			l_key - 1, '0'));
+
+	string remainder = mod2div(appended_data, key);
+
+	string codeword = data + remainder;
+	cout<<endl<< "CRC bits:\t"
+		<< remainder << "\n";
+	cout << "Transmitted Frame :"
+		<< codeword << "\n";
+}
+void CRC(int nob)
+{
+	string data, key;
+	cout << "\n Enter Frame data: \t";
+	do
+	{
+		cin >> data;
+		if (data.length() != nob)
+		{
+			cout << "\n Data bits must be of length :" << nob << "\n Please Try again !! \n";
+		}
+	} while (data.length() != nob);
+
+	for (int i = 0;i < nob;i++)
+	{
+		if (data[i] != '0' && data[i] != '1')
+		{
+			cout << "\n Data bits must have 0's and 1's only !!\n" << "\n Please Try again !! \n";
+			CRC(nob);
+			return;
+		}
+	}
+	int n;
+	cout << "\n Enter Genrator Size: \t";
+	cin >> n;
+	cout << "\n Enter Genrator Data: \t";
+	do
+	{
+		cin >> key;
+		if (key.length() != n)
+		{
+			cout << "\n Generator bits must be of length :" << n << "\n Please Try again !! \n";
+		}
+	} while (key.length() != n);
+	for (int i = 0;i < n;i++)
+	{
+		if (key[i] != '0' && key[i] != '1')
+		{
+			cout << "\n Generator bits must have 0's and 1's only !!\n" << "\n Please Try again !! \n";
+			CRC(nob);
+			return;
+		}
+	}
+	cout << endl << "Sender's Side:";
+	cout << endl << "Frame:\t" << data;
+	cout << endl << "Generator:\t" << key;
+	cout << endl << "No. of zeroes to be appended:\t" << key.length()-1;
+	cout << endl << "Message after appending zeroes:\t" << data;
+	for (int i = 0;i < key.length()-1;i++)
+	{
+		cout << "0";
+	}
+	cout << endl;
+	encodeData(data, key);
+}
+string addBinaryUtil(string a, string b)
+{
+	string result = "";
+	int s = 0;  
+	int i = a.size() - 1, j = b.size() - 1;
+	while (i >= 0 || j >= 0 || s == 1) {
+
+		s += ((i >= 0) ? a[i] - '0' : 0);
+		s += ((j >= 0) ? b[j] - '0' : 0);
+
+		result = char(s % 2 + '0') + result;
+
+		s /= 2;
+
+		i--;
+		j--;
+	}
+	return result;
+}
+void Checksum(int nob)
+{
+	int n = nob / 8;
+	string text;
+	do
+	{
+		cin >> text;
+		if (text.length() != nob)
+		{
+			cout << "\n Data bits must be of length :" << nob << "\n Please Try again !! \n";
+		}
+	} while (text.length() != nob);
+	
+	for (int i = 0;i < nob;i++)
+	{
+		if (text[i] != '0' && text[i] != '1')
+		{
+			cout << "\n Data bits must have 0's and 1's only !!\n" << "\n Please Try again !! \n";
+			Checksum(nob);
+			return;
+		}
+	}
+	string sum= text.substr(0, 8);
+	if (n > 1)
+	{
+		for (int i = 1;i < n;i++)
+		{
+			sum= addBinaryUtil(sum, text.substr(i * 8, 8));
+		}
+		
+		while (sum.length() != 8)
+		{
+			int len = sum.length() - 8;
+			sum = addBinaryUtil(sum.substr(0, len), sum.substr(len, 8));
+		}
+	}
+	cout<<endl << "Checksum generated is: \t";
+	for (int i = 0;i < 8;i++)
+	{
+		if (sum[i] == '0')
+		{
+			cout << "1";
+		}
+		else if (sum[i] =='1')
+		{
+			cout << "0";
+		}
+	}
+}
+int main()
+{
+	int choice;
+	do
+	{
+		cout<<"\n Press 1 for LRC";
+		cout <<"\n Press 2 for VRC";
+		cout <<"\n Press 3 for CRC";
+		cout <<"\n Press 4 for Checksum";
+		cout <<"\n Press 5 for Exit";
+		cout << "\n Enter Your Choice: \t";
+		cin >> choice;
+		switch (choice)
+		{
+		case 1:
+		{
+			cout << "\n ***LRC*** \n";
+			int nob;
+			do
+			{
+				cout << "\n Enter the nunmber of bits(multiple of 8): \t";
+				cin >> nob;
+				if (nob % 8 != 0)
+				{
+					cout << "\n Please enter a multiple of 8 only! \n";
+				}
+			} while (nob % 8 != 0);
+			LRC(nob);
+			break;
+		}
+		case 2:
+		{
+			cout << "\n ***VRC*** \n";
+			int nob;
+			do
+			{
+				cout << "\n Enter the nunmber of bits(multiple of 8): \t";
+				cin >> nob;
+				if (nob % 8 != 0)
+				{
+					cout << "\n Please enter a multiple of 8 only! \n";
+				}
+			} while (nob % 8 != 0);
+			
+			cout << "\n Enter the data bits (0's and 1's only): \n";
+			VRC(nob);
+			break;
+		}
+		case 3:
+		{
+			cout << "\n ***CRC*** \n";
+			int nob;
+			cout << endl << "Enter Frame Size:\t";
+			cin >> nob;
+			CRC(nob);
+			break;
+		}
+		case 4:
+		{
+			cout << "\n ***Checksum*** \n";
+			int nob;
+			do
+			{
+				cout << "\n Enter the nunmber of bits(multiple of 8): \t";
+				cin >> nob;
+				if (nob % 8 != 0)
+				{
+					cout << "\n Please enter a multiple of 8 only! \n";
+				}
+			} while (nob % 8 != 0);
+			cout << "\n Enter the data bits (0's and 1's only): \n";
+			Checksum(nob);
+			break;
+		}
+		case 5:
+		{
+			cout << "\n Closing the Program";
+			break;
+		}
+		default:
+		{
+			cout << "Wrong choice! Please Try Again..";
+			break;
+		}
+		}
+	} while (choice != 5);
+	return 0;
+}
