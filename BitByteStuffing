@@ -1,0 +1,70 @@
+#include<iostream>
+#include<string>
+#include<math.h>
+using namespace std;
+
+void findAndReplaceAll(std::string& data, std::string toSearch, std::string replaceStr)
+{
+    // Get the first occurrence
+    size_t pos = data.find(toSearch);
+    // Repeat till end is reached
+    while (pos != std::string::npos)
+    {
+        // Replace this occurrence of Sub String
+        data.replace(pos, toSearch.size(), replaceStr);
+        // Get the next occurrence from the current position
+        pos = data.find(toSearch, pos + replaceStr.size());
+    }
+}
+
+int main()
+{
+    int n, temp=1;
+    string originaltext, Stuffedtext, Destuffedtext;
+    do {
+        cout << "\nPress 1: Byte Stuffing and Destuffing ";
+        cout << "\nPress 2: Bit Stuffing and Destuffing ";
+        cout << "\nPress 3: EXIT";
+        cout << "\nEnter Your Choice:";
+        cin >> n;
+        switch (n)
+        {
+        case 1:
+            cout << "\nEnter the input stream: ";
+            cin >> originaltext;
+            Stuffedtext = originaltext;
+            findAndReplaceAll(Stuffedtext, "~", "~~");
+            findAndReplaceAll(Stuffedtext, "F", "~F");
+            Stuffedtext = "F" + Stuffedtext + "F";
+            cout << "\nAfter byte stuffing we get: " << Stuffedtext;
+            Destuffedtext = Stuffedtext.substr(1, Stuffedtext.length() - 2);
+            findAndReplaceAll(Destuffedtext, "~~", "~");
+            findAndReplaceAll(Destuffedtext, "~F", "F");
+            cout << "\nAfter byte De-stuffing we get: " << Destuffedtext;
+            break;
+        case 2:
+            cout << "\nEnter the bit stream: ";
+            cin >> originaltext;
+            Stuffedtext = originaltext;
+            Stuffedtext = "0" + Stuffedtext + "0";
+            while (Stuffedtext.find("0111111") != string::npos) {
+                findAndReplaceAll(Stuffedtext, "011111", "0111110");
+            }
+            Stuffedtext = "0111111" + Stuffedtext + "1111110";
+            cout << "\nAfter bit stuffing we get: " << Stuffedtext;
+            Destuffedtext = Stuffedtext.substr(7, Stuffedtext.length() - 14);
+            while (Destuffedtext.find("0111110") != string::npos) {
+                findAndReplaceAll(Destuffedtext, "0111110", "011111");
+            }
+            Destuffedtext = Destuffedtext.substr(1, Destuffedtext.length() - 2);
+            cout << "\nAfter bit De-stuffing we get: " << Destuffedtext;
+            break;
+        case 3:
+            cout << "Program Ended Successfully";
+            break;
+        default:
+            cout << "Wrong choice! Please Try Again...";
+            break;
+        }
+    } while (n != 3);
+}
